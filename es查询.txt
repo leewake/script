@@ -1,0 +1,180 @@
+
+先进行一次请求拿到scroll_id
+curl -XGET 'http://10.112.2.54:9200/finance_v2/settlementItem/_search?pretty&search_type=scan&scroll=2m' -d '
+{
+	"size": 1000,
+    "query": {
+        "match_all" : {}
+    }
+}
+'
+
+通过scroll_id去请求
+curl -XGET  'http://10.112.2.54:9200/_search/scroll?scroll=1m&scroll_id=c2Nhbjs1OzYyNzYwOmgxclZDSEV6VFRXNkI1VWM5Z0tVZHc7NzgzODQ6bG1sblk1amxSdk9mNDl2VVNmMUtlUTs3ODM4NjpsbWxuWTVqbFJ2T2Y0OXZVU2YxS2VROzc4Mzg1OmxtbG5ZNWpsUnZPZjQ5dlVTZjFLZVE7NjM4MjA6bUJjZFktX0dUN3FsNU5xWlNCYkkzdzsxO3RvdGFsX2hpdHM6MjIxNDYzMTs='
+
+
+-----------sas es操作------------------------
+创建index与type
+curl -XPOST "http://10.112.2.54:9200/sas" -d '{
+  "mappings": { 
+       "settleItem": {
+               "properties": {
+			        "id" : {
+                        "type" : "long"
+                    },
+					"supplierId" : {
+                        "type" : "long"
+                    },
+					"supplierName" : {
+                        "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"settleEntityId" : {
+                        "type" : "long"
+                    },
+					"settleEntityName" : {
+                        "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"orderId" : {
+                        "type" : "long"
+                    },
+					"settlePrice" : {
+                        "type" : "long"
+                    },
+					"settleItemType" : {
+                         "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"billId" : {
+                        "type" : "long"
+                    },
+					"orderItemId" : {
+                        "type" : "long"
+                    },
+					"isSettle" : {
+                        "type" : "integer"
+                    },
+					"settleItemStatus" : {
+                         "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"sbu" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"currency" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"clearTime" : {
+                       "type" : "date"
+                    },
+					"visitTime" : {
+                       "type" : "date"
+                    },
+					"infoPassTime" : {
+                       "type" : "date"
+                    },
+					"actualSettlementPrice" : {
+                       "type" : "long"
+                    },
+					"refundPrice" : {
+                       "type" : "long"
+                    },
+					"quantity" : {
+                       "type" : "long"
+                    },
+					"payType" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"orderItemActualReceived" : {
+                       "type" : "long"
+                    },
+					"totalSettlementPrice" : {
+                       "type" : "long"
+                    },
+					"productId" : {
+                       "type" : "long"
+                    },
+					"productName" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"orderContactPerson" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"performstatus" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"auditState" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"passCode" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"passExtid" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"passSerialno" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"orderStatus" : {
+                       "type" : "string",
+						"index": "not_analyzed"
+                    },
+					"supplier_order_code" : {
+						"type" : "long"
+					},
+					"settlement_change_price" : {
+						"type" : "long"
+					},
+					"actual_total_settlement_price" : {
+						"type" : "long"
+					},
+					"traveling_person" : {
+						"type" : "string",
+						"index" : "not_analyzed"
+					}
+				}	
+             }
+        }			 
+	}';	
+
+增加字段
+curl -XPUT "http://10.112.2.54:9200/sas/_mapping/settleItem" -d '{
+       "settleItem": {
+               "properties": {
+					"createTime" : {
+                       "type" : "date"
+                    },
+					"payTime" : {
+                       "type" : "date"
+                    }
+				}	
+             }
+        }';			
+
+查询一条记录
+curl -XGET 'http://10.112.2.54:9200/sas/settleItem/5?pretty'
+
+查询整个index
+curl -XPOST 'http://10.112.2.54:9200/sas/_search?pretty' -d '
+> {
+>   "query" : { "match_all": {} }
+> }'
+
+加pretty是为了返回为json格式
+
+删除整个index
+curl -XDELETE "http://10.112.2.54:9200/sas";
+
+删除一条记录
+curl -XDELETE 'http://192.168.80.200:9200/sas/settleItem/5'

@@ -1,0 +1,134 @@
+热启动
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+ 
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <fork>true</fork>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
+跳过测试 跳过生成javadoc
+mvn clean install -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
+
+
+elastic search中
+export JAVA_HOME=/home/testteam/jdk1.8.0_11
+export JRE_HOME=${JAVA_HOME}/jre    
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib    
+export PATH=.:${JAVA_HOME}/bin:$PATH
+
+
+------------------------------Maven2项目中更新版本号的技巧------------------
+在项目的顶层pom上执行
+mvn versions:set -DnewVersion=1.0.1-SNAPSHOT
+这样就可以改变整个项目的版本号了。会自动更改引用关系的。
+----------------------------------------------------------------------------
+
+
+1. mvn help:describe 你是否因为记不清某个插件有哪些goal而痛苦过,你是否因为想不起某个goal有哪些参数而苦恼,那就试试这个命令吧,它会告诉你一切的. 参数: 1. -Dplugin=pluginName 2. -Dgoal(或-Dmojo)=goalName:与-Dplugin一起使用,它会列出某个插件的goal信息,如果嫌不够详细,同样可以加-Ddetail.(注:一个插件goal也被认为是一个 “Mojo”) 下面大家就运行mvn help:describe -Dplugin=help -Dmojo=describe感受一下吧!
+
+2. mvn archetype:generate 你是怎么创建你的maven项目的?是不是像这样:mvn archetype:create -DarchetypeArtifactId=maven-archetype-quickstart -DgroupId=com.ryanote -Dartifact=common,如果你还再用的话,那你就out了,现代人都用mvn archetype:generate了,它将创建项目这件枯燥的事更加人性化,你再也不需要记那么多的archetypeArtifactId,你只需输入archetype:generate,剩下的就是做”选择题”了.
+
+3. mvn tomcat:run 用了maven后,你再也不需要用eclipse里的tomcat来运行web项目(实际工作中经常会发现用它会出现不同步更新的情况),只需在对应目录(如/ryanote)里运行 mvn tomat:run命令,然后就可在浏览器里运行http://localhost:8080/ryanote查看了.如果你想要更多的定制,可以在pom.xml文件里加下面配置: 01 02 03 04 org.codehaus.mojo 05 tomcat-maven-plugin 06 07 /web 08 9090 09 10 11 12 当然你也可以在命令里加参数来实现特定的功能,下面几个比较常用: 1. 跳过测试:-Dmaven.test.skip(=true) 2. 指定端口:-Dmaven.tomcat.port=9090 3. 忽略测试失败:-Dmaven.test.failure.ignore=true 当然,如果你的其它关联项目有过更新的话,一定要在项目根目录下运行mvn clean install来执行更新,再运行mvn tomcat:run使改动生效.
+
+4. mvn Debug tomcat:run 这条命令主要用来远程测试,它会监听远程测试用的8000端口,在eclipse里打开远程测试后,它就会跑起来了,设断点,调试,一切都是这么简单.上面提到的那几个参数在这里同样适用.
+
+5. mvn dependency:sources 故名思义,有了它,你就不用到处找源码了,运行一下,你项目里所依赖的jar包的源码就都有了
+
+
+
+-------------------------------------------------------------------------------------------
+
+-DskipTests，不执行测试用例，但编译测试用例类生成相应的class文件至target/test-classes下。
+
+-Dmaven.test.skip=true，不执行测试用例，也不编译测试用例类。
+
+-------------------------------------------------------------------------------------------
+
+
+
+----------------------------如何在启动Spring boot应用过程中，切换profiles?------------------------------
+     >>>  java -Dspring.profiles.active=profileName -jar targetfile.war
+          在启动中，指定需要使用的profile name，直接进行启动
+
+     >>>  java -jar app.jar --spring.profiles.active=profileName --server.port=8060
+
+     >>>  mvnw spring-boot:run -Drun.profiles=profileName,profileName2
+          使用 spring-boot:run基于maven的来启动
+     >>> 直接打包没有lib-provided目录的版本，在catalina.properties中指定所需的active profile
+          echo spring.profiles.active=container >> catalina.properties
+  说明一下：spring-boot:run后面可以输入的参数和-D的参数不同，这个取决于其maven plugin的支持参数。
+详细的参数信息，可以参照地址： http://docs.spring.io/spring-boot/docs/current/maven-plugin/index.html
+--------------------------------------------------------------------------------------------------------
+
+
+
+----------------------------------------------------------------发布jar时，只打包自己的代码--------------------------------------------------------------------
+当自己写项目需要发布出去给别人依赖时，就只需要自己写的代码打包，依赖的包不能打进来。否则最后别人在用你提供的包时，就会出现重复包，导致最后打包时包会非常巨大。
+
+在这个Spring Boot Maven Plugin这个插件下，我们只需要提供classifier即可实现这个功能。具体如下：
+
+
+<project>
+  ...
+  <build>
+    ...
+    <plugins>
+      ...
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.7.RELEASE</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+            <configuration>
+              <classifier>exec</classifier>
+            </configuration>
+          </execution>
+        </executions>
+        ...
+      </plugin>
+      ...
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--------------------------------------------------为maven依赖包添加源码--------------------------------------------------------------
+一种方法用命令行：mvn dependency：sources或者mvn dependency:sources -DdownloadSources=true -DdownloadJavadocs=true，会下载源码在jar包相同路径。若没有生效可以尝试clean，然后就ok了。
+另外一种在eclipse中，window->preference->maven->勾选download artifact sources，以及java doc
+第三种在pom中，增加：
+<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs>
+        </configuration>
+</plugin>
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+--------------------------------------------即找出所有的jar包，再解压出其文件列表，再搜索冲突的类名-------------------------------
+find . -name '*.jar' -exec jar -tvf {} \; | grep EE   
+---------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,9 @@
+选出字段大于1的数据
+SELECT * FROM (SELECT order_id, count(*) num FROM `set_settlement_item` GROUP BY order_id HAVING count(*) >1) as a order by num desc;
+
+假设现在表里有组合索引(settlement_id, product_type)
+可以命中索引
+EXPLAIN SELECT settlement_id FROM `set_settlement_item` where product_type = 11;
+
+不能命中索引
+EXPLAIN SELECT * FROM `set_settlement_item` where product_type = 11;

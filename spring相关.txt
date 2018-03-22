@@ -1,0 +1,38 @@
+------------------------------激活profile的方式---------------------------
+
+
+1.作为SpringMVC中的DispatcherServlet的初始化参数
+<servlet>  
+    <servlet-name>springMVC</servlet-name>  
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>  
+    <init-param>  
+        <param-name>contextConfigLocation</param-name>  
+        <param-value>classpath:/spring-servlet.xml</param-value>  
+    </init-param>  
+    <init-param>  
+        <param-name>spring.profiles.default</param-name>  
+        <param-value>dev</param-value>  
+    </init-param>  
+    <load-on-startup>1</load-on-startup>  
+</servlet> 
+
+
+2.作为Web 应用上下文中的初始化参数
+<context-param>  
+    <param-name>spring.profiles.default</param-name>  
+    <param-value>dev</param-value>  
+</context-param>
+
+
+3.作为JNDI的入口
+
+4.作为环境变量
+java -jar XXX.jar --profile=dev
+
+5.作为虚拟机的系统参数
+java -Dprofile=dev -jar XXX.jar
+
+6.使用@AtivceProfile来进行激活
+此注解可以放在类上
+
+--------------------------------------------------------------------------
